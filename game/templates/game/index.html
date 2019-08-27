@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="{%  static 'game/css/style.css' %}" type="text/css">
+</head>
+<body>
+
+    <div class="alert info">
+      <span class="closebtn">&times;</span>
+      <strong>Info!</strong> Indicates a neutral informative change or action.
+    </div>
+    <table>
+        <tr>
+            <td class="cell" id="0">0</td>
+            <td class="cell" id="1">1</td>
+            <td class="cell" id="2">2</td>
+        </tr>
+         <tr>
+            <td class="cell" id="3">3</td>
+            <td class="cell" id="4">4</td>
+            <td class="cell" id="5">5</td>
+        </tr>
+        <tr>
+            <td class="cell" id="6">6</td>
+            <td class="cell" id="7">7</td>
+            <td class="cell" id="8">8</td>
+        </tr>
+    </table>
+
+    <a href="{% url 'replay' %}"><button> Play Again</button></a>
+    <script  src="{%  static 'game/js/script.js' %}" ></script>
+</body>
+</html>
