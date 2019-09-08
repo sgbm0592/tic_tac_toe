@@ -1,6 +1,4 @@
-from random import choice, random
-#ask to user to play again
-def playAgain():
+def play_again():
     print('Replay? (yes or no)')
     return input().lower().startswith('y')
 
@@ -19,17 +17,41 @@ def show_board(tablero):
     print('     |     |')
     print('______________')
 
+def game_over(board):
+    return check_winner(board, player) or check_winner(board, computer)
+
 def check_winner(board, letter):
+    winOptions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [6, 4, 2],
+    ];
     flag = False
     for [i, j, k] in winOptions:
         flag = flag or (board[i] == letter and board[j] == letter and board[k] == letter)
     return flag
 
+
 def make_move(board, letter, move):
     board[move] = letter
 
+
 def check_space_free(board, move):
     return board[move] == ' '
+
+
+def get_free_spaces(board):
+    emptySpaces = []
+    for i in range(9):
+        if board[i] == ' ':
+            emptySpaces.append(i)
+    return emptySpaces
+
 
 def get_player_move(board):
     move = ' '
@@ -48,65 +70,57 @@ def check_board_full(board):
             return False
     return True
 
-def get_random_move(board, movesList):
-    availableMoves = []
-    for i in movesList:
-        if check_space_free(board, i):
-            availableMoves.append(i)
-
-    if len(availableMoves) != 0:
-        return choice(availableMoves)
+def evaluate(board):
+    if check_winner(board, computer):
+        score = +1
+    elif check_winner(board, player):
+        score = -1
     else:
-        return None
+        score = 0
+    return score
 
-def get_computer_move(board, computer):
-    # check center
-    if check_space_free(board, 4):
-        return 4
-    # try win
-    for i in range(9):
-        copy = list(board)
-        if check_space_free(copy, i):
-            make_move(copy, computer, i)
-            if check_winner(copy, computer):
-                return i
+def minimax(board, depth, playerTurn):
+    if playerTurn == computer:
+        best = [-1, -1]
+    else:
+        best = [-1, 1]
 
-    # block player
-    for i in range(9):
-        copy = list(board)
-        if check_space_free(copy, i):
-            make_move(copy, player, i)
-            if check_winner(copy, player):
-                return i
-    # check corners
-    move = get_random_move(board, [0, 2, 6, 8])
-    if move != None:
-        return move
+    if game_over(board) or depth == 0:
+        score = evaluate(board)
+        return [-1, score]
 
-    # retutn sides
-    return get_random_move(board, [1, 3, 5, 7])
+    for availableMove in get_free_spaces(board):
+        x = availableMove
+        board[x] = playerTurn
+        if playerTurn == computer:
+            score = minimax(board, depth - 1, player)
+        else:
+            score = minimax(board, depth - 1, computer)
+        board[x] = ' '
+        score[0] = x
 
-#define the options with which you can win
-winOptions = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [6, 4, 2],
-];
+        if playerTurn == computer:
+            if score[1] > best[1]:
+                best = score
+        else:
+            if score[1] < best[1]:
+                best = score
+
+    return best
+
+def get_computer_move(board):
+    depth = len(get_free_spaces(board))
+    move = minimax(board, depth, computer)
+    return move[0]
+
+
 player = 'O'
 computer = 'X'
-
-
-def start_game(theBoard):
+def start_game():
+    theBoard = [' '] * 9
     while True:
-
         turn = 'player'
         playing = True
-
         while playing:
             if turn == 'player':
                 # player
@@ -126,8 +140,7 @@ def start_game(theBoard):
                     else:
                         turn = 'computer'
             else:
-                # computer
-                move = get_computer_move(theBoard, computer)
+                move = get_computer_move(theBoard)
                 make_move(theBoard, computer, move)
 
                 if check_winner(theBoard, computer):
@@ -143,12 +156,14 @@ def start_game(theBoard):
                     else:
                         turn = 'player'
 
-        if not playAgain():
+        if not play_again():
             break
+        else:
+            theBoard = [' '] * 9
+
 
 def main():
-    theBoard = [' '] * 9
-    start_game(theBoard)
+    start_game()
 
 if __name__ == "__main__":
     main()

@@ -19,7 +19,7 @@ class GameView(View):
         message = ' '
         game.make_move(boardGame, player, player_move)
         if not game.check_board_full(boardGame):
-            move = game.get_computer_move(boardGame, computer)
+            move = game.get_computer_move(boardGame)
             game.make_move(boardGame, computer, move)
         else:
             move = -1
