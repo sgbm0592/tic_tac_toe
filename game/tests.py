@@ -12,8 +12,29 @@ class TestGame(unittest.TestCase):
         self.player = 'O'
         self.computer = 'X'
 
+    def test_evaluate(self):
+        result = game.evaluate(self.boardComputerWin)
+        self.assertEqual(result, 1)
+        result = game.evaluate(self.boardUserWin)
+        self.assertEqual(result, -1)
+
+    def test_get_free_spaces(self):
+        free_spaces = game.get_free_spaces(self.boardFull)
+        self.assertEqual(len(free_spaces),0)
+        free_spaces = game.get_free_spaces(self.boardGame)
+        self.assertEqual(len(free_spaces), 9)
+        free_spaces = game.get_free_spaces(self.boardComputerWin)
+        self.assertEqual(len(free_spaces), 3)
+
+    def test_minimax(self):
+        depth = len(game.get_free_spaces(self.boardComputerWin))
+        move = game.minimax(self.boardComputerWin, depth, self.computer)
+        self.assertEqual(1, move[1])
+        depth = len(game.get_free_spaces(self.boardUserWin))
+        move = game.minimax(self.boardUserWin,depth,self.player)
+        self.assertEqual(-1, move[1])
+
     def test_check_winner(self):
-        #game.show_board(self.boardComputerWin)
         win_computer = game.check_winner(self.boardComputerWin,self.computer);
         win_user = game.check_winner(self.boardComputerWin, self.player);
         self.assertTrue(win_computer)
@@ -26,14 +47,14 @@ class TestGame(unittest.TestCase):
         self.assertTrue(win_user)
 
     def test_make_move(self):
-        move = game.get_random_move(self.boardFree,[0, 2, 6, 8])
+        move = game.get_computer_move(self.boardFree)
         game.make_move(self.boardFree, self.computer, move)
         self.assertEqual(self.boardFree[move],self.computer)
 
     def test_check_space_free(self):
-        move = game.get_random_move(self.boardFree,[0, 2, 6, 8])
+        move = game.get_computer_move(self.boardFull)
         free = game.check_space_free(self.boardFree,move)
-        move = game.get_random_move(self.boardFree,[0, 2, 6, 8])   
+        move = game.get_computer_move(self.boardFree)
         full = game.check_space_free(self.boardFull,move)
         self.assertTrue(free)
         self.assertFalse(full)
@@ -46,14 +67,8 @@ class TestGame(unittest.TestCase):
         self.assertTrue(full)
         pass
 
-    def test_make_random_move(self):
-        move = game.get_random_move(self.boardFull,[])
-        self.assertEqual(move, None)
-        move = game.get_random_move(self.boardFull,[0,2,6,8])
-        self.assertEqual(move, None)
-
     def test_get_computer_move(self):
-        move = game.get_computer_move(self.boardGame, self.computer)
+        move = game.get_computer_move(self.boardGame)
         game.make_move(self.boardGame,self.computer,move)
-        self.assertEqual(move,4)
+        self.assertEqual(move,0)
         self.assertEqual(self.boardGame[move],self.computer)
